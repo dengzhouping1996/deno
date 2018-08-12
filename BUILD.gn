@@ -35,14 +35,14 @@ config("deno_config") {
 }
 
 main_extern = [
-  "$rust_build:futures",
-  "$rust_build:libc",
-  "$rust_build:log",
-  "$rust_build:sha1",
-  "$rust_build:tempfile",
-  "$rust_build:tokio",
-  "$rust_build:tokio_current_thread",
-  "$rust_build:url",
+  "src/rust_deps:futures",
+  "src/rust_deps:libc",
+  "src/rust_deps:log",
+  "src/rust_deps:sha1",
+  "src/rust_deps:tempfile",
+  "src/rust_deps/tokio:tokio",
+  "src/rust_deps/tokio:tokio_current_thread",
+  "src/rust_deps/url:url",
   "//build_extra/flatbuffers/rust:flatbuffers",
   ":msg_rs",
 ]

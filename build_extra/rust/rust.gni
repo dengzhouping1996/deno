@@ -1,6 +1,7 @@
 declare_args() {
-  # Absolute path of rust build files.
-  rust_build = "//build_extra/rust/"
+  # Absolute path of rust source code files.
+  rust_tp = "//third_party/rust_crates"
+  rust_reg_github = "$rust_tp/registry/src/github.com-1ecc6299db9ec823/"
 }
 
 if (is_win) {

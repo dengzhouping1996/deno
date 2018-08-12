@@ -1,0 +1,77 @@
+# Copyright 2018 the Deno authors. All rights reserved. MIT license.
+
+# Dependencies between third party crates is mapped out here manually.
+# This is intentionally a bit tedious to help avoid adding too many deps.
+# Always try to minimize dependencies.
+# Versioning for third party rust crates is controlled in //Cargo.toml
+# Use //tools/sync_third_party.py instead of running "cargo install".
+
+import("//build_extra/rust/rust.gni")
+
+rust_crate("libc") {
+  source_root = "$rust_reg_github/libc-0.2.42/src/lib.rs"
+  features = [ "use_std" ]
+}
+
+rust_crate("log") {
+  source_root = "$rust_reg_github/log-0.4.3/src/lib.rs"
+  extern = [ ":cfg_if" ]
+}
+
+rust_crate("cfg_if") {
+  source_root = "$rust_reg_github/cfg-if-0.1.4/src/lib.rs"
+}
+
+rust_crate("sha1") {
+  source_root = "$rust_reg_github/sha1-0.6.0/src/lib.rs"
+}
+
+rust_crate("tempfile") {
+  source_root = "$rust_reg_github/tempfile-3.0.3/src/lib.rs"
+  extern = [
+    ":libc",
+    ":rand",
+    ":remove_dir_all",
+  ]
+
+  if (is_win) {
+    extern += [ "winapi:winapi" ]
+  }
+}
+
+rust_crate("rand") {
+  source_root = "$rust_reg_github/rand-0.5.4/src/lib.rs"
+  features = [
+    "std",
+    "alloc",
+  ]
+  extern = [
+    ":libc",
+    ":rand_core",
+  ]
+  if (is_win) {
+    extern += [ "winapi:winapi" ]
+  }
+  if (is_mac) {
+    libs = [ "Security.framework" ]
+  }
+}
+
+rust_crate("rand_core") {
+  source_root = "$rust_reg_github/rand_core-0.2.1/src/lib.rs"
+}
+
+rust_crate("remove_dir_all") {
+  source_root = "$rust_reg_github/remove_dir_all-0.5.1/src/lib.rs"
+  if (is_win) {
+    extern = [ "winapi:winapi" ]
+  }
+}
+
+rust_crate("futures") {
+  source_root = "$rust_reg_github/futures-0.1.23/src/lib.rs"
+  features = [
+    "use_std",
+    "with-deprecated",
+  ]
+}

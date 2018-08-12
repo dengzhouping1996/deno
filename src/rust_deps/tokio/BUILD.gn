@@ -1,0 +1,281 @@
+# Copyright 2018 the Deno authors. All rights reserved. MIT license.
+import("//build_extra/rust/rust.gni")
+
+tokio_root = "$rust_tp/git/checkouts/tokio-377c595163f99a10/5d0d2a2/"
+
+rust_crate("tokio") {
+  source_root = "$tokio_root/src/lib.rs"
+  extern = [
+    "..:futures",
+    ":mio",
+    ":tokio_executor",
+    ":tokio_fs",
+    ":tokio_io",
+    ":tokio_reactor",
+    ":tokio_tcp",
+    ":tokio_threadpool",
+    ":tokio_current_thread",
+    ":tokio_timer",
+    ":tokio_udp",
+  ]
+}
+
+rust_crate("tokio_current_thread") {
+  source_root = "$tokio_root/tokio-current-thread/src/lib.rs"
+  extern = [
+    ":tokio_executor",
+    "..:futures",
+  ]
+}
+
+rust_crate("tokio_executor") {
+  source_root = "$tokio_root/tokio-executor/src/lib.rs"
+  extern = [ "..:futures" ]
+}
+
+rust_crate("tokio_fs") {
+  source_root = "$tokio_root//tokio-fs/src/lib.rs"
+  extern = [
+    "..:futures",
+    ":tokio_io",
+    ":tokio_threadpool",
+  ]
+}
+
+rust_crate("tokio_io") {
+  source_root = "$tokio_root/tokio-io/src/lib.rs"
+  extern = [
+    "..:futures",
+    "..:log",
+    ":bytes",
+  ]
+}
+
+rust_crate("tokio_timer") {
+  source_root = "$tokio_root/tokio-timer/src/lib.rs"
+  extern = [
+    "..:futures",
+    ":tokio_executor",
+  ]
+}
+
+rust_crate("tokio_udp") {
+  source_root = "$tokio_root/tokio-udp/src/lib.rs"
+  extern = [
+    "..:futures",
+    "..:log",
+    ":bytes",
+    ":mio",
+    ":tokio_codec",
+    ":tokio_io",
+    ":tokio_reactor",
+  ]
+}
+
+rust_crate("tokio_codec") {
+  source_root = "$tokio_root/tokio-codec/src/lib.rs"
+  extern = [
+    "..:futures",
+    ":bytes",
+    ":tokio_io",
+  ]
+}
+
+rust_crate("tokio_reactor") {
+  source_root = "$tokio_root/tokio-reactor/src/lib.rs"
+  extern = [
+    "..:futures",
+    "..:log",
+    ":mio",
+    ":slab",
+    ":tokio_executor",
+    ":tokio_io",
+  ]
+}
+
+rust_crate("tokio_tcp") {
+  source_root = "$tokio_root/tokio-tcp/src/lib.rs"
+  extern = [
+    "..:futures",
+    ":bytes",
+    ":iovec",
+    ":mio",
+    ":tokio_io",
+    ":tokio_reactor",
+  ]
+}
+
+rust_crate("tokio_threadpool") {
+  source_root = "$tokio_root/tokio-threadpool/src/lib.rs"
+  extern = [
+    "..:futures",
+    "..:log",
+    "..:rand",
+    ":crossbeam_deque",
+    ":crossbeam_utils",
+    ":num_cpus",
+    ":tokio_executor",
+  ]
+}
+
+if (is_win) {
+  rust_crate("miow") {
+    source_root = "$rust_reg_github/miow-0.2.1/src/lib.rs"
+    extern = [
+      "../winapi:kernel32",
+      "../winapi:ws2_32",
+      ":net2",
+    ]
+
+    # TODO: Upgrade to a current version of the 'winapi' crate.
+    # See https://github.com/denoland/deno/issues/484.
+    extern_version = [
+      {
+        label = "../winapi:winapi-0.2"
+        crate_name = "winapi"
+        crate_version = "0.2"
+      },
+    ]
+  }
+
+}
+
+rust_crate("mio") {
+  source_root = "$rust_reg_github/mio-0.6.15/src/lib.rs"
+  features = [
+    "default",
+    "with-deprecated",
+  ]
+  extern = [
+    "..:libc",
+    "..:log",
+    ":iovec",
+    ":lazycell",
+    ":net2",
+    ":slab",
+  ]
+
+  if (is_win) {
+    extern += [
+      "../winapi:kernel32",
+      ":miow",
+    ]
+
+    # TODO: Upgrade to a current version of the 'winapi' crate.
+    # See https://github.com/denoland/deno/issues/484.
+    extern_version = [
+      {
+        label = "../winapi:winapi-0.2"
+        crate_name = "winapi"
+        crate_version = "0.2"
+      },
+    ]
+  }
+}
+
+rust_crate("iovec") {
+  source_root = "$rust_reg_github/iovec-0.1.2/src/lib.rs"
+  extern = [ "..:libc" ]
+
+  if (is_win) {
+    # TODO: Upgrade to a current version of the 'winapi' crate.
+    # See https://github.com/denoland/deno/issues/484.
+    extern_version = [
+      {
+        label = "../winapi:winapi-0.2"
+        crate_name = "winapi"
+        crate_version = "0.2"
+      },
+    ]
+  }
+}
+
+rust_crate("lazycell") {
+  source_root = "$rust_reg_github/lazycell-0.6.0/src/lib.rs"
+}
+
+rust_crate("net2") {
+  source_root = "$rust_reg_github/net2-0.2.33/src/lib.rs"
+  features = [
+    "default",
+    "duration",
+  ]
+  extern = [
+    "..:cfg_if",
+    "..:libc",
+  ]
+  if (is_win) {
+    extern += [ "../winapi:winapi" ]
+  }
+}
+
+rust_crate("slab") {
+  source_root = "$rust_reg_github/slab-0.4.0/src/lib.rs"
+}
+
+rust_crate("bytes") {
+  source_root = "$rust_reg_github/bytes-0.4.9/src/lib.rs"
+  extern = [
+    ":byteorder",
+    ":iovec",
+  ]
+}
+
+rust_crate("byteorder") {
+  source_root = "$rust_reg_github/byteorder-1.2.4/src/lib.rs"
+}
+
+rust_crate("crossbeam_deque") {
+  source_root = "$rust_reg_github/crossbeam-deque-0.5.1/src/lib.rs"
+  extern = [
+    ":crossbeam_epoch",
+    ":crossbeam_utils",
+  ]
+}
+
+rust_crate("crossbeam_epoch") {
+  source_root = "$rust_reg_github/crossbeam-epoch-0.5.1/src/lib.rs"
+  features = [ "use_std" ]
+  extern = [
+    "..:cfg_if",
+    ":arrayvec",
+    ":crossbeam_utils",
+    ":lazy_static",
+    ":memoffset",
+    ":scopeguard",
+  ]
+}
+
+rust_crate("crossbeam_utils") {
+  source_root = "$rust_reg_github/crossbeam-utils-0.4.1/src/lib.rs"
+  features = [ "use_std" ]
+  extern = [ "..:cfg_if" ]
+}
+
+rust_crate("arrayvec") {
+  source_root = "$rust_reg_github/arrayvec-0.4.7/src/lib.rs"
+  extern = [ ":nodrop" ]
+}
+
+rust_crate("nodrop") {
+  source_root = "$rust_reg_github/nodrop-0.1.12/src/lib.rs"
+}
+
+rust_crate("lazy_static") {
+  source_root = "$rust_reg_github/lazy_static-1.0.2/src/lib.rs"
+}
+
+rust_crate("memoffset") {
+  source_root = "$rust_reg_github/memoffset-0.2.1/src/lib.rs"
+}
+
+rust_crate("scopeguard") {
+  source_root = "$rust_reg_github/scopeguard-0.3.3/src/lib.rs"
+  features = [ "use_std" ]
+}
+
+rust_crate("num_cpus") {
+  source_root = "$rust_reg_github/num_cpus-1.8.0/src/lib.rs"
+  extern = [ "..:libc" ]
+}
+
